@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from .analysis import analyze_image, find_value_mode, store
 from .ground import detect_ground_cluster, ground_inside_forms_mask, ground_mask_from_cluster, summarize_ground
@@ -193,4 +198,22 @@ async def export(request: ExportRequest) -> ExportResponse:
         summary=summary,
     )
 
+
+_static_dir = os.environ.get("FRONTEND_DIST")
+if _static_dir:
+    static_path = Path(_static_dir).resolve()
+    index_file = static_path / "index.html"
+    if static_path.exists() and index_file.exists():
+        app.mount("/assets", StaticFiles(directory=static_path / "assets"), name="assets")
+
+        @app.get("/", include_in_schema=False)
+        async def serve_index() -> FileResponse:
+            return FileResponse(index_file)
+
+        @app.get("/{spa_path:path}", include_in_schema=False)
+        async def serve_spa(spa_path: str) -> FileResponse:
+            candidate = (static_path / spa_path).resolve()
+            if candidate.is_file() and candidate.is_relative_to(static_path):
+                return FileResponse(candidate)
+            return FileResponse(index_file)
 

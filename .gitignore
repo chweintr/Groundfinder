@@ -4,12 +4,12 @@ frontend/dist
 
 # Python
 backend/.venv
-backend/__pycache__
 backend/.pytest_cache
+**/__pycache__/
+*.py[cod]
 
 # OS
 .DS_Store
 
 # Exports
 exports/
-

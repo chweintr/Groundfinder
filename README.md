@@ -74,6 +74,10 @@ Backend tests cover color conversions and mask construction boundaries.
 - `samples/ground-passages.png` – neutral interior with revealed ground accents.
 - `notebooks/groundfinder_pipeline_demo.ipynb` – optional walkthrough using the backend helpers inside Jupyter.
 
+## Container & Deployment
+- **Docker:** `docker build -t groundfinder .` then `docker run -p 8000:8000 groundfinder`. The container builds the React frontend, bundles it into the image, and serves it alongside the FastAPI API on port 8000.
+- **Railway:** Point the service at the repository root; Railway detects the Dockerfile automatically. No extra configuration is required beyond setting the service port (`$PORT` is handled by the container).
+
 ## Constraints & Deviations
 - Temperature categories follow the spec’d warm/cool/neutral splits, but the warm split and neutral chroma slider are not yet exposed in the UI. The backend supports customisation and the UI can be extended with additional controls.
 - The ground-inside-forms mask uses Canny edges plus morphological fills; it provides solid results on structured images but may need tuning for extremely noisy inputs.
