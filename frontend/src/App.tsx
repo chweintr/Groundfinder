@@ -34,7 +34,6 @@ export default function App() {
 
         // Auto-request ground highlight
         if (result.detectedGroundIndex !== null && result.clusters[result.detectedGroundIndex]) {
-          const groundCluster = result.clusters[result.detectedGroundIndex];
           const payload: GroundInsidePayload = {
             analysisId: result.analysisId,
             groundSource: "detected",
