@@ -14,6 +14,7 @@ GroundFinder is a fast single-image analysis tool that helps painters see domina
 - Lab-space k-means clustering (k=5) with the most prevalent cluster highlighted by default; click any cluster to isolate it.
 - Overlay modes with highlight, wash (other pixels fall to 15% opacity), and extract (transparent background) views.
 - Value and hue isolation use soft tolerance bands (± bins / ± degrees) around the selected mode, and sliders let you shift the band centres directly.
+- Ground suggestions panel identifies dominant value bands, surfaces the most representative swatch, and offers palette matches with ready-made pigment recipes.
 - Ground tools: auto-detect near-neutral mid-value clusters, set ground from a cluster or eyedrop sample, and analyse “ground inside forms” using edge detection and morphological region filling. Coverage metrics are reported alongside the overlay.
 - Sampling panel reports RGB, Lab, LCH, hex, and relative value. Quick copy buttons place RGB or Lab values in the clipboard.
 - PaintMaker bridge: copies the sampled RGB triplet to the clipboard before opening the PaintMaker mixer in a new tab.
@@ -65,6 +66,7 @@ Backend tests cover color conversions and mask construction boundaries.
 
 ## Frontend Notes
 - Tabs organise the right-hand column into Histograms, Clusters, Ground, Sampler, and Export panels.
+- The Suggestions tab highlights dominant value bands, shows a proposed ground swatch, and lists palette matches (pre-computed with Mixbox) complete with pigment ratios.
 - The canvas supports click sampling, drag-and-drop uploads, and clipboard paste.
 - Ground selection can come from the detected cluster, any active cluster, or the sampler (eyedropper) data.
 - The PaintMaker integration copies `R,G,B` to the clipboard before opening the mixer in a new tab. If the site blocks iframes, the new-tab flow is the reliable path; this behaviour is documented in comments and here to minimise breakage risk.
@@ -86,5 +88,6 @@ Backend tests cover color conversions and mask construction boundaries.
 - [x] Set ground to a mid gray (detected cluster) → ground-inside-forms highlights thin gray passages under object silhouettes.
 - [x] Eyedrop a pixel, then “Open in PaintMaker” → RGB copied to clipboard and PaintMaker opens in a new tab ready to paste.
 - [x] Export panel saves highlight/wash/extract PNGs and the JSON summary.
+- [x] Suggestions tab surfaces a dominant ground colour, coverage percentage, and palette recipes.
 
 Enjoy exploring how grounds weave through your reference imagery!

@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .analysis import analyze_image, find_value_mode, store
+from .analysis import analyze_image, compute_ground_suggestions, find_value_mode, store
 from .ground import detect_ground_cluster, ground_inside_forms_mask, ground_mask_from_cluster, summarize_ground
 from .mask_ops import DEFAULT_VIEWS, generate_mask, render_views
 from .schemas import (
@@ -68,6 +68,8 @@ async def analyze(file: UploadFile = File(...)) -> AnalysisResponse:
         for cluster in result.clusters
     ]
 
+    suggestions = compute_ground_suggestions(result)
+
     response = AnalysisResponse(
         analysisId=result.analysis_id,
         originalSize=(int(result.original_array.shape[0]), int(result.original_array.shape[1])),
@@ -83,6 +85,35 @@ async def analyze(file: UploadFile = File(...)) -> AnalysisResponse:
             "warmSpan": 60.0,
             "neutralChroma": 8.0,
         },
+        groundSuggestions=[
+            {
+                "valueStep": item["valueStep"],
+                "valueLabel": item["valueLabel"],
+                "coverage": item["coverage"],
+                "color": {
+                    "hex": item["averageHex"],
+                    "rgb": [int(v) for v in item["averageRgb"].tolist()],
+                    "lab": [float(x) for x in item["averageLab"].tolist()],
+                    "lch": [float(x) for x in item["averageLch"].tolist()],
+                    "temperature": item["temperature"],
+                },
+                "paletteMatches": [
+                    {
+                        "id": match["id"],
+                        "name": match["name"],
+                        "hex": match["hex"],
+                        "lab": match["lab"],
+                        "lch": match["lch"],
+                        "rgb": match["rgb"],
+                        "deltaE": match["deltaE"],
+                        "recipe": match["recipe"],
+                        "notes": match["notes"],
+                    }
+                    for match in item.get("paletteMatches", [])
+                ],
+            }
+            for item in suggestions
+        ],
     )
     return response
 

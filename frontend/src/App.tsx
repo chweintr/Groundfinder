@@ -251,6 +251,28 @@ export default function App() {
     void fetchMask(analysis, nextSelection);
   }, [analysis, selection, sample.lab, fetchMask]);
 
+  const setGroundFromLab = useCallback(
+    (lab: number[]) => {
+      if (!analysis || !selection) return;
+      const nextGround: GroundSelection = {
+        type: "lab",
+        lab: [lab[0], lab[1], lab[2]],
+        tolerance: selection.ground.tolerance,
+      };
+      updateSelection({ mode: "ground", ground: nextGround });
+    },
+    [analysis, selection, updateSelection],
+  );
+
+  const applyValueBand = useCallback(
+    (labL: number) => {
+      if (!selection) return;
+      const bin = Math.max(0, Math.min(255, Math.round((labL / 100) * 255)));
+      updateSelection({ mode: "value", valueCenter: bin });
+    },
+    [selection, updateSelection],
+  );
+
   const handleGroundInside = useCallback(async () => {
     if (!analysis || !selection) return;
     const payload: GroundInsidePayload = {
@@ -307,6 +329,65 @@ export default function App() {
       setTabs([]);
       return;
     }
+    const suggestionTab = {
+      id: "suggestions",
+      label: "Suggestions",
+      content: (
+        <div className="ground-suggestions">
+          {analysis.groundSuggestions.length ? (
+            analysis.groundSuggestions.map((suggestion, index) => (
+              <div className="suggestion-card" key={index}>
+                <div className="suggestion-summary">
+                  <div className="suggestion-swatch" style={{ backgroundColor: suggestion.color.hex }} />
+                  <div>
+                    <h4>
+                      Value {suggestion.valueStep} · {suggestion.valueLabel}
+                    </h4>
+                    <p>
+                      {Math.round(suggestion.coverage * 1000) / 10}% coverage · {suggestion.color.temperature}
+                    </p>
+                    <p>{suggestion.color.hex}</p>
+                  </div>
+                </div>
+                <div className="suggestion-actions">
+                  <button type="button" onClick={() => applyValueBand(suggestion.color.lab[0])}>
+                    Preview value band
+                  </button>
+                  <button type="button" onClick={() => setGroundFromLab(suggestion.color.lab)}>
+                    Use average color as ground
+                  </button>
+                </div>
+                <div className="palette-matches">
+                  <h5>Palette matches</h5>
+                  {suggestion.paletteMatches.map((match) => (
+                    <div className="palette-match" key={match.id}>
+                      <span
+                        className="palette-swatch"
+                        style={{ backgroundColor: match.hex }}
+                        title={match.name}
+                      />
+                      <div className="palette-details">
+                        <strong>
+                          {match.name} · ΔE {match.deltaE.toFixed(2)}
+                        </strong>
+                        <p>{match.recipe}</p>
+                        <small>{match.notes}</small>
+                      </div>
+                      <button type="button" onClick={() => setGroundFromLab(match.lab)}>
+                        Set ground
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No dominant ground candidates detected in this image.</p>
+          )}
+        </div>
+      ),
+    };
+
     const nextTabs = [
       {
         id: "histograms",
@@ -341,6 +422,7 @@ export default function App() {
           </div>
         ),
       },
+      suggestionTab,
       {
         id: "ground",
         label: "Ground",
@@ -401,7 +483,19 @@ export default function App() {
       },
     ];
     setTabs(nextTabs);
-  }, [analysis, selection, updateSelection, groundInside, maskLoading, sample, setGroundFromSample, exportCurrent, handleGroundInside]);
+  }, [
+    analysis,
+    selection,
+    updateSelection,
+    groundInside,
+    maskLoading,
+    sample,
+    setGroundFromSample,
+    exportCurrent,
+    handleGroundInside,
+    setGroundFromLab,
+    applyValueBand,
+  ]);
 
   useEffect(() => {
     if (!tabs.length) return;

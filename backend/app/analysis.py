@@ -11,7 +11,8 @@ import numpy as np
 from PIL import Image
 from sklearn.cluster import KMeans
 
-from .color_ops import lab_to_lch, rgb_to_lab
+from .color_ops import lab_to_lch, lab_to_rgb, rgb_to_hex, rgb_to_lab
+from .palette import match_palette, value_step_label
 
 MAX_ANALYSIS_EDGE = 1600
 DEFAULT_K = 5
@@ -207,3 +208,61 @@ def upsample_mask(mask: np.ndarray, target_shape: Tuple[int, int]) -> np.ndarray
     target_h, target_w = target_shape
     resized = cv2.resize(mask.astype(np.uint8), (target_w, target_h), interpolation=cv2.INTER_NEAREST)
     return resized
+
+
+def _temperature_label(mean_lch: np.ndarray) -> str:
+    chroma = mean_lch[1]
+    hue = mean_lch[2]
+    if chroma < 8.0:
+        return "neutral"
+    if (hue <= 60.0) or (hue >= 300.0):
+        return "warm"
+    if 60.0 < hue < 240.0:
+        return "cool"
+    return "warm"
+
+
+def compute_ground_suggestions(result: AnalysisResult, top_n: int = 3) -> List[dict]:
+    lab = result.lab_array.reshape(-1, 3)
+    lch = result.lch_array.reshape(-1, 3)
+    L = lab[:, 0]
+    total = lab.shape[0]
+    if total == 0:
+        return []
+
+    edges = np.linspace(0.0, 100.0, 10)
+    suggestions: List[dict] = []
+
+    for idx in range(len(edges) - 1):
+        lower, upper = edges[idx], edges[idx + 1]
+        if idx == len(edges) - 2:
+            mask = (L >= lower) & (L <= upper)
+        else:
+            mask = (L >= lower) & (L < upper)
+        count = int(np.count_nonzero(mask))
+        if count == 0:
+            continue
+        coverage = count / total
+        mean_lab = lab[mask].mean(axis=0)
+        mean_lch = lch[mask].mean(axis=0)
+        rgb = lab_to_rgb(mean_lab)
+        suggestions.append(
+            {
+                "valueStep": idx + 1,
+                "valueLabel": value_step_label(idx + 1),
+                "coverage": coverage,
+                "averageLab": mean_lab,
+                "averageLch": mean_lch,
+                "averageRgb": rgb,
+                "averageHex": rgb_to_hex(rgb),
+                "temperature": _temperature_label(mean_lch),
+            }
+        )
+
+    suggestions.sort(key=lambda item: item["coverage"], reverse=True)
+    top = suggestions[:top_n]
+
+    for item in top:
+        item["paletteMatches"] = match_palette(item["averageLab"], top_n=3)
+
+    return top

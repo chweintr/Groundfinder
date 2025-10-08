@@ -24,6 +24,34 @@ class ValueModeSummary(BaseModel):
     upperBin: int
 
 
+class ColorSwatch(BaseModel):
+    hex: str
+    rgb: List[int]
+    lab: List[float]
+    lch: List[float]
+    temperature: str
+
+
+class PaletteMatchSummary(BaseModel):
+    id: str
+    name: str
+    hex: str
+    lab: List[float]
+    lch: List[float]
+    rgb: List[int]
+    deltaE: float
+    recipe: str
+    notes: str
+
+
+class GroundSuggestion(BaseModel):
+    valueStep: int
+    valueLabel: str
+    coverage: float
+    color: ColorSwatch
+    paletteMatches: List[PaletteMatchSummary]
+
+
 class AnalysisResponse(BaseModel):
     analysisId: str
     originalSize: Tuple[int, int]
@@ -36,6 +64,7 @@ class AnalysisResponse(BaseModel):
     valueMode: ValueModeSummary
     detectedGroundIndex: Optional[int]
     temperatureDefaults: Dict[str, float]
+    groundSuggestions: List[GroundSuggestion]
 
 
 class MaskRequest(BaseModel):
@@ -93,4 +122,3 @@ class ExportResponse(BaseModel):
     wash: str
     extract: str
     summary: Dict[str, object]
-

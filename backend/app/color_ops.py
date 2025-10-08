@@ -48,9 +48,56 @@ def lab_to_relative_value(L: np.ndarray) -> np.ndarray:
     return np.clip(L, 0, 100)
 
 
+def linear_to_srgb(x: np.ndarray) -> np.ndarray:
+    return np.where(x <= 0.0031308, 12.92 * x, 1.055 * np.power(np.clip(x, 0, None), 1 / 2.4) - 0.055)
+
+
+def lab_to_rgb(lab: np.ndarray) -> np.ndarray:
+    """Convert Lab values to 0-255 sRGB."""
+    lab = np.asarray(lab, dtype=np.float32)
+    L = lab[..., 0]
+    a = lab[..., 1]
+    b = lab[..., 2]
+
+    fy = (L + 16.0) / 116.0
+    fx = a / 500.0 + fy
+    fz = fy - b / 200.0
+
+    def finv(t: np.ndarray) -> np.ndarray:
+        return np.where(t ** 3 > 0.008856, t ** 3, (t - 16.0 / 116.0) / 7.787)
+
+    X = 0.95047 * finv(fx)
+    Y = 1.0 * finv(fy)
+    Z = 1.08883 * finv(fz)
+
+    M = np.array(
+        [
+            [3.2404542, -1.5371385, -0.4985314],
+            [-0.9692660, 1.8760108, 0.0415560],
+            [0.0556434, -0.2040259, 1.0572252],
+        ],
+        dtype=np.float32,
+    )
+
+    rgb_linear = np.stack([X, Y, Z], axis=-1) @ M.T
+    rgb = linear_to_srgb(rgb_linear)
+    rgb_uint8 = np.clip(np.round(rgb * 255.0), 0, 255).astype(np.uint8)
+    return rgb_uint8
+
+
+def rgb_to_hex(rgb: np.ndarray) -> str:
+    rgb = np.asarray(rgb).astype(np.uint8)
+    if rgb.ndim > 1:
+        rgb = rgb.reshape(-1)[:3]
+    return "#" + "".join(f"{int(v):02X}" for v in rgb)
+
+
 __all__ = [
     "srgb_to_linear",
     "rgb_to_lab",
     "lab_to_lch",
     "lab_to_relative_value",
+    "lab_to_rgb",
+    "linear_to_srgb",
+    "rgb_to_hex",
 ]

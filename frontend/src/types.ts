@@ -34,6 +34,33 @@ export interface AnalysisData {
     warmSpan: number;
     neutralChroma: number;
   };
+  groundSuggestions: GroundSuggestion[];
+}
+
+export interface PaletteMatch {
+  id: string;
+  name: string;
+  hex: string;
+  lab: number[];
+  lch: number[];
+  rgb: number[];
+  deltaE: number;
+  recipe: string;
+  notes: string;
+}
+
+export interface GroundSuggestion {
+  valueStep: number;
+  valueLabel: string;
+  coverage: number;
+  color: {
+    hex: string;
+    rgb: number[];
+    lab: number[];
+    lch: number[];
+    temperature: string;
+  };
+  paletteMatches: PaletteMatch[];
 }
 
 export interface MaskPayload {
