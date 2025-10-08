@@ -6,6 +6,10 @@
   gap: 1.5rem;
 }
 
+.app.simple {
+  padding: 2rem 3rem;
+}
+
 header {
   display: flex;
   justify-content: space-between;
@@ -44,6 +48,147 @@ header p {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.5rem;
   flex: 1;
+}
+
+.simple-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  flex: 1;
+  align-items: start;
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.image-wrapper {
+  position: relative;
+  max-width: 100%;
+  max-height: 80vh;
+}
+
+.image-wrapper img {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+  border-radius: 8px;
+}
+
+.image-wrapper .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.recommendation-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.swatch {
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.details h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #0f172a;
+}
+
+.details p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.value-label {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.temp-label {
+  text-transform: capitalize;
+  font-style: italic;
+}
+
+.coverage {
+  font-size: 0.9rem;
+}
+
+.hex {
+  font-family: monospace;
+  font-size: 1rem;
+  color: #64748b;
+}
+
+.mixing-recommendation {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.mixing-recommendation h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.match {
+  display: flex;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.match-swatch {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  flex-shrink: 0;
+}
+
+.match p {
+  margin: 0.25rem 0;
+}
+
+.match-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.match-recipe {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.match-notes {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-style: italic;
 }
 
 .canvas-pane {
