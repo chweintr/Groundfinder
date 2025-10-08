@@ -7,7 +7,8 @@ import type {
   ViewMode,
 } from "../types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:8000");
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -81,4 +82,3 @@ export async function requestExport(payload: ExportPayload): Promise<ExportRespo
 export function asDataUrl(base64: string, mime = "image/png"): string {
   return `data:${mime};base64,${base64}`;
 }
-
