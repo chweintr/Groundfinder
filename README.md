@@ -10,10 +10,10 @@ GroundFinder is a fast single-image analysis tool that helps painters see domina
 ## Feature Overview
 - Upload or paste an image (analysis runs on a copy downsampled so the long edge ≤ 1600 px).
 - Perceptual value histogram (256 bins over Lab L*), hue histogram (360 bins over Lab hue angle), and numeric readouts.
-- Temperature classification (warm, cool, neutral) with adjustable category selection and neutral threshold tied to chroma.
+- Temperature classification (warm, cool, neutral) with adjustable category selection, warm-span slider, and neutral chroma threshold.
 - Lab-space k-means clustering (k=5) with the most prevalent cluster highlighted by default; click any cluster to isolate it.
 - Overlay modes with highlight, wash (other pixels fall to 15% opacity), and extract (transparent background) views.
-- Value and hue isolation use soft tolerance bands (± bins / ± degrees) around the selected mode.
+- Value and hue isolation use soft tolerance bands (± bins / ± degrees) around the selected mode, and sliders let you shift the band centres directly.
 - Ground tools: auto-detect near-neutral mid-value clusters, set ground from a cluster or eyedrop sample, and analyse “ground inside forms” using edge detection and morphological region filling. Coverage metrics are reported alongside the overlay.
 - Sampling panel reports RGB, Lab, LCH, hex, and relative value. Quick copy buttons place RGB or Lab values in the clipboard.
 - PaintMaker bridge: copies the sampled RGB triplet to the clipboard before opening the PaintMaker mixer in a new tab.
@@ -79,7 +79,6 @@ Backend tests cover color conversions and mask construction boundaries.
 - **Railway:** Point the service at the repository root; Railway detects the Dockerfile automatically. No extra configuration is required beyond setting the service port (`$PORT` is handled by the container).
 
 ## Constraints & Deviations
-- Temperature categories follow the spec’d warm/cool/neutral splits, but the warm split and neutral chroma slider are not yet exposed in the UI. The backend supports customisation and the UI can be extended with additional controls.
 - The ground-inside-forms mask uses Canny edges plus morphological fills; it provides solid results on structured images but may need tuning for extremely noisy inputs.
 
 ## Acceptance Checklist

@@ -40,6 +40,8 @@ export interface MaskRequestPayload {
   groundTolerance?: number;
   views?: ViewMode[];
   upscale?: boolean;
+  warmSpan?: number;
+  neutralChroma?: number;
 }
 
 export async function requestMask(payload: MaskRequestPayload): Promise<MaskResponse> {

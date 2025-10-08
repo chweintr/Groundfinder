@@ -80,9 +80,7 @@ async def analyze(file: UploadFile = File(...)) -> AnalysisResponse:
         valueMode=ValueModeSummary(peakBin=peak_bin, lowerBin=lower_bin, upperBin=upper_bin),
         detectedGroundIndex=detected_ground,
         temperatureDefaults={
-            "warmUpper": 60.0,
-            "coolLower": 60.0,
-            "coolUpper": 240.0,
+            "warmSpan": 60.0,
             "neutralChroma": 8.0,
         },
     )
@@ -110,6 +108,8 @@ async def mask(request: MaskRequest) -> MaskResponse:
         temperature_category=request.temperatureCategory,
         ground_lab=ground_lab,
         ground_tolerance=request.groundTolerance,
+        warm_span=request.warmSpan,
+        neutral_chroma=request.neutralChroma,
     )
 
     payload = render_views(result, mask, views=views, upscale=request.upscale)
@@ -176,6 +176,8 @@ async def export(request: ExportRequest) -> ExportResponse:
         temperature_category=request.temperatureCategory,
         ground_lab=ground_lab,
         ground_tolerance=request.groundTolerance,
+        warm_span=request.warmSpan,
+        neutral_chroma=request.neutralChroma,
     )
 
     payload = render_views(result, mask, views=DEFAULT_VIEWS, upscale=True)
@@ -187,6 +189,8 @@ async def export(request: ExportRequest) -> ExportResponse:
         "clusterRankIndex": request.clusterRankIndex,
         "temperatureCategory": request.temperatureCategory,
         "groundTolerance": request.groundTolerance,
+        "warmSpan": request.warmSpan,
+        "neutralChroma": request.neutralChroma,
         "imageSize": list(result.original_array.shape[:2]),
     }
 
@@ -216,4 +220,3 @@ if _static_dir:
             if candidate.is_file() and candidate.is_relative_to(static_path):
                 return FileResponse(candidate)
             return FileResponse(index_file)
-

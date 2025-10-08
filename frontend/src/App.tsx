@@ -124,6 +124,8 @@ export default function App() {
           mode: state.mode,
           views: ["highlight", "wash", "extract"],
           upscale: true,
+          warmSpan: state.warmSpan,
+          neutralChroma: state.neutralChroma,
         };
         if (state.mode === "value") {
           payload.valueRange = valueRange(state);
@@ -195,6 +197,7 @@ export default function App() {
         const result = await analyzeImage(file);
         setAnalysis(result);
         const defaultGround = createDefaultGround(result);
+        const { warmSpan = 60, neutralChroma = 8 } = result.temperatureDefaults ?? {};
         const initialSelection: ImageSelectionState = {
           mode: "value",
           view: DEFAULT_VIEW,
@@ -204,6 +207,8 @@ export default function App() {
           hueTolerance: 12,
           clusterRankIndex: 0,
           temperatureCategory: "warm",
+          warmSpan,
+          neutralChroma,
           ground: defaultGround,
         };
         setSelection(initialSelection);
@@ -278,6 +283,8 @@ export default function App() {
     const payload: MaskRequestPayload = {
       analysisId: analysis.analysisId,
       mode: selection.mode,
+      warmSpan: selection.warmSpan,
+      neutralChroma: selection.neutralChroma,
     };
     if (selection.mode === "value") {
       payload.valueRange = valueRange(selection);
@@ -456,32 +463,60 @@ export default function App() {
               ))}
             </div>
             {selection.mode === "value" && (
-              <label className="tolerance">
-                Value tolerance ±{selection.valueTolerance} bins
-                <input
-                  type="range"
-                  min={1}
-                  max={20}
-                  value={selection.valueTolerance}
-                  onChange={(event) => updateSelection({ valueTolerance: Number(event.target.value) })}
-                />
-                <span>
-                  Bin {valueRange(selection)[0]} – {valueRange(selection)[1]}
-                </span>
-              </label>
+              <div className="value-controls">
+                <label className="tolerance">
+                  Value center
+                  <input
+                    type="range"
+                    min={0}
+                    max={255}
+                    value={selection.valueCenter}
+                    onChange={(event) => updateSelection({ valueCenter: Number(event.target.value) })}
+                  />
+                  <span>
+                    Bin {selection.valueCenter} · L {((selection.valueCenter / 255) * 100).toFixed(1)}
+                  </span>
+                </label>
+                <label className="tolerance">
+                  Value tolerance ±{selection.valueTolerance} bins
+                  <input
+                    type="range"
+                    min={1}
+                    max={20}
+                    value={selection.valueTolerance}
+                    onChange={(event) => updateSelection({ valueTolerance: Number(event.target.value) })}
+                  />
+                  <span>
+                    Bin {valueRange(selection)[0]} – {valueRange(selection)[1]}
+                  </span>
+                </label>
+              </div>
             )}
             {selection.mode === "hue" && (
-              <label className="tolerance">
-                Hue tolerance ±{selection.hueTolerance}°
-                <input
-                  type="range"
-                  min={2}
-                  max={90}
-                  value={selection.hueTolerance}
-                  onChange={(event) => updateSelection({ hueTolerance: Number(event.target.value) })}
-                />
-                <span>{selection.hue.toFixed(1)}°</span>
-              </label>
+              <div className="hue-controls">
+                <label className="tolerance">
+                  Hue center
+                  <input
+                    type="range"
+                    min={0}
+                    max={359}
+                    value={selection.hue}
+                    onChange={(event) => updateSelection({ hue: Number(event.target.value) })}
+                  />
+                  <span>{selection.hue.toFixed(1)}°</span>
+                </label>
+                <label className="tolerance">
+                  Hue tolerance ±{selection.hueTolerance}°
+                  <input
+                    type="range"
+                    min={2}
+                    max={90}
+                    value={selection.hueTolerance}
+                    onChange={(event) => updateSelection({ hueTolerance: Number(event.target.value) })}
+                  />
+                  <span>Band {selection.hue.toFixed(1)}° ± {selection.hueTolerance}°</span>
+                </label>
+              </div>
             )}
             {selection.mode === "temperature" && (
               <div className="temperature-options">
@@ -494,6 +529,28 @@ export default function App() {
                     {option}
                   </button>
                 ))}
+                <label className="tolerance">
+                  Warm span around 0°
+                  <input
+                    type="range"
+                    min={10}
+                    max={120}
+                    value={selection.warmSpan}
+                    onChange={(event) => updateSelection({ warmSpan: Number(event.target.value) })}
+                  />
+                  <span>{selection.warmSpan.toFixed(0)}°</span>
+                </label>
+                <label className="tolerance">
+                  Neutral chroma cutoff
+                  <input
+                    type="range"
+                    min={1}
+                    max={30}
+                    value={selection.neutralChroma}
+                    onChange={(event) => updateSelection({ neutralChroma: Number(event.target.value) })}
+                  />
+                  <span>C {selection.neutralChroma.toFixed(1)}</span>
+                </label>
               </div>
             )}
             {groundInside && (

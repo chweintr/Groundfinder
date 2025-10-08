@@ -48,6 +48,8 @@ class MaskRequest(BaseModel):
     temperatureCategory: Optional[Literal["warm", "cool", "neutral"]] = None
     groundLab: Optional[List[float]] = Field(default=None, description="Lab center for ground masking")
     groundTolerance: float = 7.5
+    warmSpan: float = 60.0
+    neutralChroma: float = 8.0
     views: Optional[List[Literal["highlight", "wash", "extract"]]] = None
     upscale: bool = True
 
@@ -91,5 +93,4 @@ class ExportResponse(BaseModel):
     wash: str
     extract: str
     summary: Dict[str, object]
-
 

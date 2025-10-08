@@ -31,9 +31,7 @@ export interface AnalysisData {
   valueMode: ValueModeSummary;
   detectedGroundIndex: number | null;
   temperatureDefaults: {
-    warmUpper: number;
-    coolLower: number;
-    coolUpper: number;
+    warmSpan: number;
     neutralChroma: number;
   };
 }
@@ -79,5 +77,7 @@ export interface ImageSelectionState {
   hueTolerance: number;
   clusterRankIndex: number;
   temperatureCategory: "warm" | "cool" | "neutral";
+  warmSpan: number;
+  neutralChroma: number;
   ground: GroundSelection;
 }

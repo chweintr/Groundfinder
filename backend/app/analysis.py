@@ -116,25 +116,35 @@ def compute_hue_histogram(H: np.ndarray, bins: int = 360) -> np.ndarray:
     return hist.astype(np.int64)
 
 
-def compute_temperature_map(
+def classify_temperature(
     lch: np.ndarray,
-    warm_upper: float = 60.0,
-    cool_lower: float = 60.0,
-    cool_upper: float = 240.0,
+    warm_span: float = 60.0,
     neutral_chroma: float = 8.0,
 ) -> np.ndarray:
-    """Classify pixels into warm (0), cool (1), or neutral (2)."""
+    """Return temperature classes (0 warm, 1 cool, 2 neutral)."""
     H = lch[..., 2]
     C = lch[..., 1]
 
-    warm_mask = ((H >= 345.0) | (H < warm_upper))
-    cool_mask = (H > cool_lower) & (H < cool_upper)
+    warm_span = float(np.clip(warm_span, 0.0, 180.0))
+    warm_upper = warm_span
+    warm_lower = (360.0 - warm_span) % 360.0
+
+    warm_mask = (H <= warm_upper) | (H >= warm_lower)
     neutral_mask = C < neutral_chroma
 
-    result = np.full(H.shape, fill_value=1, dtype=np.uint8)  # default cool
+    result = np.full(H.shape, fill_value=1, dtype=np.uint8)
     result[warm_mask] = 0
     result[neutral_mask] = 2
     return result
+
+
+def compute_temperature_map(
+    lch: np.ndarray,
+    warm_span: float = 60.0,
+    neutral_chroma: float = 8.0,
+) -> np.ndarray:
+    """Classify pixels into warm (0), cool (1), or neutral (2)."""
+    return classify_temperature(lch, warm_span=warm_span, neutral_chroma=neutral_chroma)
 
 
 def find_value_mode(hist: np.ndarray) -> Tuple[int, Tuple[int, int]]:
@@ -197,5 +207,3 @@ def upsample_mask(mask: np.ndarray, target_shape: Tuple[int, int]) -> np.ndarray
     target_h, target_w = target_shape
     resized = cv2.resize(mask.astype(np.uint8), (target_w, target_h), interpolation=cv2.INTER_NEAREST)
     return resized
-
-

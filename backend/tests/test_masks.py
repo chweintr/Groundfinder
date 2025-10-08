@@ -57,3 +57,24 @@ def test_ground_mask_lab_distance():
     mask = generate_mask(result, "ground", ground_lab=np.array([50.0, 0.0, 0.0]), ground_tolerance=0.5)
     assert mask.all()
 
+
+def test_temperature_mask_respects_span():
+    result = make_dummy_result()
+    # Set a warm-ish hue with decent chroma
+    result.lch_array[0, 0] = np.array([60.0, 20.0, 20.0], dtype=np.float32)
+    wide_mask = generate_mask(
+        result,
+        "temperature",
+        temperature_category="warm",
+        warm_span=60,
+        neutral_chroma=4.0,
+    )
+    narrow_mask = generate_mask(
+        result,
+        "temperature",
+        temperature_category="warm",
+        warm_span=10,
+        neutral_chroma=4.0,
+    )
+    assert wide_mask[0, 0]
+    assert not narrow_mask[0, 0]

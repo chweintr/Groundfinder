@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from .analysis import AnalysisResult, upsample_mask
+from .analysis import AnalysisResult, classify_temperature, upsample_mask
 
 # View modes
 HIGHLIGHT = "highlight"
@@ -71,7 +71,13 @@ def _mask_from_cluster(labels: np.ndarray, cluster_rank_index: int, ranked_clust
     return labels == target
 
 
-def _mask_from_temperature(temperature_map: np.ndarray, category: str) -> np.ndarray:
+def _mask_from_temperature(
+    lch_array: np.ndarray,
+    *,
+    category: str,
+    warm_span: float,
+    neutral_chroma: float,
+) -> np.ndarray:
     mapping = {
         "warm": 0,
         "cool": 1,
@@ -79,7 +85,8 @@ def _mask_from_temperature(temperature_map: np.ndarray, category: str) -> np.nda
     }
     if category not in mapping:
         raise ValueError(f"Unknown temperature category: {category}")
-    return temperature_map == mapping[category]
+    classes = classify_temperature(lch_array, warm_span=warm_span, neutral_chroma=neutral_chroma)
+    return classes == mapping[category]
 
 
 def _mask_from_ground_lab(lab_array: np.ndarray, target_lab: np.ndarray, tolerance: float) -> np.ndarray:
@@ -98,6 +105,8 @@ def generate_mask(
     temperature_category: str | None = None,
     ground_lab: np.ndarray | None = None,
     ground_tolerance: float = 7.5,
+    warm_span: float = 60.0,
+    neutral_chroma: float = 8.0,
 ) -> np.ndarray:
     if mode == "value":
         if not value_range:
@@ -116,7 +125,12 @@ def generate_mask(
     elif mode == "temperature":
         if not temperature_category:
             raise ValueError("temperature_category required")
-        mask = _mask_from_temperature(result.temperature_map, temperature_category)
+        mask = _mask_from_temperature(
+            result.lch_array,
+            category=temperature_category,
+            warm_span=warm_span,
+            neutral_chroma=neutral_chroma,
+        )
     elif mode == "ground":
         if ground_lab is None:
             raise ValueError("ground_lab required for ground mask")
@@ -159,5 +173,4 @@ def render_views(
         output[view] = _encode_png(image)
 
     return output
-
 
