@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 
-import { analyzeImage, requestGroundInside, asDataUrl, type GroundInsidePayload } from "./api/client";
+import { analyzeImage, requestGroundInside, asDataUrl, matchColor, type GroundInsidePayload } from "./api/client";
 import { UploadZone } from "./components/UploadZone";
-import type { AnalysisData } from "./types";
+import { ImageViewer, type SampleInfo } from "./components/ImageViewer";
+import type { AnalysisData, ColorMatchResponse } from "./types";
 
 export default function App() {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
@@ -11,6 +12,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [groundHighlight, setGroundHighlight] = useState<string | null>(null);
+  const [sampledColor, setSampledColor] = useState<ColorMatchResponse | null>(null);
+  const [samplePoint, setSamplePoint] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     return () => {
@@ -23,6 +26,8 @@ export default function App() {
       setLoading(true);
       setError(null);
       setGroundHighlight(null);
+      setSampledColor(null);
+      setSamplePoint(null);
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
       }
@@ -53,6 +58,17 @@ export default function App() {
     [imageUrl],
   );
 
+  const handleColorSample = useCallback(async (info: SampleInfo) => {
+    setSamplePoint({ x: info.x, y: info.y });
+    try {
+      const rgb = [info.color.r, info.color.g, info.color.b];
+      const result = await matchColor(rgb);
+      setSampledColor(result);
+    } catch (err) {
+      console.error("Color matching failed", err);
+    }
+  }, []);
+
   if (!analysis || !imageUrl) {
     return (
       <div className="app">
@@ -78,8 +94,14 @@ export default function App() {
       <main className="simple-layout">
         <div className="image-container">
           <div className="image-wrapper">
-            <img src={imageUrl} alt="Analyzed painting" />
-            {groundHighlight && <img src={groundHighlight} alt="Ground highlight" className="overlay" />}
+            <ImageViewer
+              imageUrl={imageUrl}
+              overlayUrl={groundHighlight}
+              viewMode="highlight"
+              mode="ground"
+              onSample={handleColorSample}
+              samplePoint={samplePoint}
+            />
           </div>
         </div>
         <aside className="recommendation-panel">
@@ -88,6 +110,9 @@ export default function App() {
               <div className="swatch" style={{ backgroundColor: topSuggestion.color.hex }} />
               <div className="details">
                 <h2>Dominant Ground</h2>
+                <p className="ground-explanation">
+                  A toned ground unifies your palette and establishes value from the start
+                </p>
                 <p className="value-label">
                   {topSuggestion.valueLabel} · Value {topSuggestion.valueStep}
                 </p>
@@ -116,6 +141,25 @@ export default function App() {
             </>
           ) : (
             <p>No dominant ground detected</p>
+          )}
+
+          {sampledColor && (
+            <div className="color-dropper">
+              <h3>Color Dropper</h3>
+              <div className="dropper-match">
+                <div className="dropper-swatch" style={{ backgroundColor: sampledColor.color.hex }} />
+                <div className="dropper-details">
+                  <p className="dropper-temp">{sampledColor.color.temperature}</p>
+                  <p className="dropper-hex">{sampledColor.color.hex}</p>
+                </div>
+              </div>
+              {sampledColor.paletteMatches.length > 0 && (
+                <div className="dropper-recipe">
+                  <p className="dropper-recipe-name">{sampledColor.paletteMatches[0].name}</p>
+                  <p className="dropper-recipe-mix">{sampledColor.paletteMatches[0].recipe}</p>
+                </div>
+              )}
+            </div>
           )}
         </aside>
       </main>

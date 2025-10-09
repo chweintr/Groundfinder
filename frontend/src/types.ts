@@ -108,3 +108,14 @@ export interface ImageSelectionState {
   neutralChroma: number;
   ground: GroundSelection;
 }
+
+export interface ColorMatchResponse {
+  color: {
+    hex: string;
+    rgb: number[];
+    lab: number[];
+    lch: number[];
+    temperature: string;
+  };
+  paletteMatches: PaletteMatch[];
+}

@@ -191,6 +191,82 @@ header p {
   font-style: italic;
 }
 
+.ground-explanation {
+  color: #64748b !important;
+  font-size: 0.85rem !important;
+  font-style: italic;
+  margin-top: 0.25rem !important;
+}
+
+.color-dropper {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.color-dropper h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.dropper-match {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.dropper-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  flex-shrink: 0;
+}
+
+.dropper-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dropper-temp {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: capitalize;
+  font-style: italic;
+  margin: 0;
+}
+
+.dropper-hex {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
+}
+
+.dropper-recipe {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+
+.dropper-recipe-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.25rem 0;
+}
+
+.dropper-recipe-mix {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
 .canvas-pane {
   background: #ffffff;
   border-radius: 16px;

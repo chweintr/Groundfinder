@@ -122,3 +122,12 @@ class ExportResponse(BaseModel):
     wash: str
     extract: str
     summary: Dict[str, object]
+
+
+class ColorMatchRequest(BaseModel):
+    rgb: List[int] = Field(..., description="RGB color values [r, g, b]")
+
+
+class ColorMatchResponse(BaseModel):
+    color: ColorSwatch
+    paletteMatches: List[PaletteMatchSummary]

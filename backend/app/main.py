@@ -9,13 +9,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .analysis import analyze_image, compute_ground_suggestions, find_value_mode, store
+from .analysis import analyze_image, classify_temperature, compute_ground_suggestions, find_value_mode, store
+from .color_ops import lab_to_lch, rgb_to_hex, rgb_to_lab
 from .ground import detect_ground_cluster, ground_inside_forms_mask, ground_mask_from_cluster, summarize_ground
 from .mask_ops import DEFAULT_VIEWS, generate_mask, render_views
+from .palette import match_palette
 from .schemas import (
     AnalysisResponse,
     ClusterCenter,
     ClusterSummary,
+    ColorMatchRequest,
+    ColorMatchResponse,
     ExportRequest,
     ExportResponse,
     GroundInsideRequest,
@@ -231,6 +235,45 @@ async def export(request: ExportRequest) -> ExportResponse:
         wash=payload["wash"],
         extract=payload["extract"],
         summary=summary,
+    )
+
+
+@app.post("/match-color", response_model=ColorMatchResponse)
+async def match_color(request: ColorMatchRequest) -> ColorMatchResponse:
+    """Match a single RGB color to the closest palette entries."""
+    rgb_array = np.array(request.rgb, dtype=np.uint8).reshape(1, 1, 3)
+    lab = rgb_to_lab(rgb_array).reshape(3)
+    lch = lab_to_lch(lab.reshape(1, 1, 3)).reshape(3)
+    hex_color = rgb_to_hex(rgb_array).item()
+
+    temp_map = classify_temperature(lch.reshape(1, 1, 3), warm_span=60.0, neutral_chroma=8.0)
+    temp_value = int(temp_map[0, 0])
+    temp_label = {0: "warm", 1: "cool", 2: "neutral"}[temp_value]
+
+    matches = match_palette(lab, top_n=3)
+
+    return ColorMatchResponse(
+        color={
+            "hex": hex_color,
+            "rgb": request.rgb,
+            "lab": [float(x) for x in lab.tolist()],
+            "lch": [float(x) for x in lch.tolist()],
+            "temperature": temp_label,
+        },
+        paletteMatches=[
+            {
+                "id": match["id"],
+                "name": match["name"],
+                "hex": match["hex"],
+                "lab": match["lab"],
+                "lch": match["lch"],
+                "rgb": match["rgb"],
+                "deltaE": match["deltaE"],
+                "recipe": match["recipe"],
+                "notes": match["notes"],
+            }
+            for match in matches
+        ],
     )
 
 

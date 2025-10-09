@@ -1,5 +1,6 @@
 import type {
   AnalysisData,
+  ColorMatchResponse,
   ExportResponse,
   GroundInsideResponse,
   MaskMode,
@@ -83,4 +84,13 @@ export async function requestExport(payload: ExportPayload): Promise<ExportRespo
 
 export function asDataUrl(base64: string, mime = "image/png"): string {
   return `data:${mime};base64,${base64}`;
+}
+
+export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
+  const response = await fetch(`${API_BASE_URL}/match-color`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rgb }),
+  });
+  return handleResponse<ColorMatchResponse>(response);
 }
