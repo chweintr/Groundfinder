@@ -69,6 +69,15 @@ export default function App() {
     }
   }, []);
 
+  const handleReset = useCallback(() => {
+    setAnalysis(null);
+    setImageUrl(null);
+    setGroundHighlight(null);
+    setSampledColor(null);
+    setSamplePoint(null);
+    setError(null);
+  }, []);
+
   if (!analysis || !imageUrl) {
     return (
       <div className="app">
@@ -85,15 +94,6 @@ export default function App() {
   }
 
   const topSuggestion = analysis.groundSuggestions[0];
-
-  const handleReset = useCallback(() => {
-    setAnalysis(null);
-    setImageUrl(null);
-    setGroundHighlight(null);
-    setSampledColor(null);
-    setSamplePoint(null);
-    setError(null);
-  }, []);
 
   return (
     <div className="app simple">
