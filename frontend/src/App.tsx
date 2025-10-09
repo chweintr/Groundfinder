@@ -86,10 +86,20 @@ export default function App() {
 
   const topSuggestion = analysis.groundSuggestions[0];
 
+  const handleReset = useCallback(() => {
+    setAnalysis(null);
+    setImageUrl(null);
+    setGroundHighlight(null);
+    setSampledColor(null);
+    setSamplePoint(null);
+    setError(null);
+  }, []);
+
   return (
     <div className="app simple">
       <header>
         <h1>GroundFinder</h1>
+        <button className="reset-button" onClick={handleReset}>Analyze New Image</button>
       </header>
       <main className="simple-layout">
         <div className="image-container">
