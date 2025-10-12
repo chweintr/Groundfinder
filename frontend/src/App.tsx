@@ -4,6 +4,7 @@ import "./App.css";
 import { analyzeImage, requestGroundInside, asDataUrl, matchColor, type GroundInsidePayload } from "./api/client";
 import { UploadZone } from "./components/UploadZone";
 import { ImageViewer, type SampleInfo } from "./components/ImageViewer";
+import { ColorTheoryViz } from "./components/ColorTheoryViz";
 import type { AnalysisData, ColorMatchResponse, GroundSuggestion } from "./types";
 
 export default function App() {
@@ -152,7 +153,14 @@ export default function App() {
                 <div className="dropper-swatch-large" style={{ backgroundColor: sampledColor.color.hex }} />
                 <div className="dropper-info">
                   <p className="dropper-hex-large">{sampledColor.color.hex}</p>
-                  <p className="dropper-temp-large">{sampledColor.color.temperature}</p>
+                  
+                  <ColorTheoryViz
+                    hex={sampledColor.color.hex}
+                    lab={sampledColor.color.lab}
+                    lch={sampledColor.color.lch}
+                    temperature={sampledColor.color.temperature}
+                  />
+                  
                   {sampledColor.paletteMatches.length > 0 && (
                     <div className="dropper-recipe-bottom">
                       <p className="dropper-recipe-label">How to mix it:</p>
@@ -178,9 +186,15 @@ export default function App() {
                 <p className="value-label">
                   {topSuggestion.valueLabel} · Value {topSuggestion.valueStep}
                 </p>
-                <p className="temp-label">{topSuggestion.color.temperature}</p>
                 <p className="coverage">{Math.round(topSuggestion.coverage * 100)}% coverage</p>
                 <p className="hex">{topSuggestion.color.hex}</p>
+                
+                <ColorTheoryViz
+                  hex={topSuggestion.color.hex}
+                  lab={topSuggestion.color.lab}
+                  lch={topSuggestion.color.lch}
+                  temperature={topSuggestion.color.temperature}
+                />
               </div>
               {topSuggestion.paletteMatches.length > 0 && (
                 <div className="mixing-recommendation">

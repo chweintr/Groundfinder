@@ -755,6 +755,140 @@ header p {
   color: #dc2626;
 }
 
+/* Color Theory Visualization */
+.color-theory-viz {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.theory-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theory-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.theory-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.theory-value {
+  font-size: 0.85rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.theory-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.theory-badge[data-temp="warm"] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.theory-badge[data-temp="cool"] {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.theory-badge[data-temp="neutral"] {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.theory-bar-container {
+  margin-bottom: 1rem;
+}
+
+.theory-bar {
+  position: relative;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.hue-bar {
+  background: linear-gradient(
+    to right,
+    #ff0000 0%,
+    #ffff00 16.66%,
+    #00ff00 33.33%,
+    #00ffff 50%,
+    #0000ff 66.66%,
+    #ff00ff 83.33%,
+    #ff0000 100%
+  );
+}
+
+.value-bar {
+  background: linear-gradient(to right, #000000, #808080, #ffffff);
+}
+
+.saturation-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.saturation-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, #808080, transparent);
+}
+
+.theory-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 100%;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #1e293b, 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.theory-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #64748b;
+  padding: 0 0.25rem;
+}
+
+.theory-tip {
+  margin: 0.75rem 0 0 0;
+  padding: 0.5rem;
+  background: #eff6ff;
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #1e40af;
+  line-height: 1.4;
+}
+
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;
