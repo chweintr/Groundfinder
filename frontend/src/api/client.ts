@@ -96,19 +96,30 @@ let colorMixer: ColorMixer | null = null;
 
 function getColorMixer(): ColorMixer {
   if (!colorMixer) {
-    colorMixer = new ColorMixer();
-    colorMixer.setColorSet(DEFAULT_PIGMENT_SET, '#F7F5EF'); // Paper white background
+    console.log('Initializing color mixer with pigment set...');
+    try {
+      colorMixer = new ColorMixer();
+      console.log('ColorMixer created, setting color set...');
+      colorMixer.setColorSet(DEFAULT_PIGMENT_SET, '#F7F5EF'); // Paper white background
+      console.log('Color mixer initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize color mixer:', error);
+      throw error;
+    }
   }
   return colorMixer;
 }
 
 export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
+  console.log('matchColor called with RGB:', rgb);
   try {
     const mixer = getColorMixer();
     const rgbTuple: RgbTuple = [rgb[0]!, rgb[1]!, rgb[2]!];
+    console.log('Finding similar color for:', rgbTuple);
     
     // Find the best color mixture match
     const similarColor = mixer.findSimilarColor(rgbTuple);
+    console.log('Similar color found:', similarColor);
     
     if (!similarColor) {
       throw new Error('No color match found');
@@ -116,6 +127,7 @@ export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
 
     const { colorMixture, similarity } = similarColor;
     const rgbColor = Rgb.fromTuple(colorMixture.layerRgb);
+    console.log('Color mixture:', colorMixture.parts, 'similarity:', similarity);
     
     // Format the recipe as a human-readable string
     const recipeParts = colorMixture.parts

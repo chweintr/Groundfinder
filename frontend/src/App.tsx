@@ -4,7 +4,7 @@ import "./App.css";
 import { analyzeImage, requestGroundInside, asDataUrl, matchColor, type GroundInsidePayload } from "./api/client";
 import { UploadZone } from "./components/UploadZone";
 import { ImageViewer, type SampleInfo } from "./components/ImageViewer";
-import type { AnalysisData, ColorMatchResponse } from "./types";
+import type { AnalysisData, ColorMatchResponse, GroundSuggestion } from "./types";
 
 export default function App() {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
@@ -14,12 +14,41 @@ export default function App() {
   const [groundHighlight, setGroundHighlight] = useState<string | null>(null);
   const [sampledColor, setSampledColor] = useState<ColorMatchResponse | null>(null);
   const [samplePoint, setSamplePoint] = useState<{ x: number; y: number } | null>(null);
+  const [enhancedGroundSuggestion, setEnhancedGroundSuggestion] = useState<GroundSuggestion | null>(null);
 
   useEffect(() => {
     return () => {
       if (imageUrl) URL.revokeObjectURL(imageUrl);
     };
   }, [imageUrl]);
+
+  // Enhance ground suggestion with real mixing recipe
+  useEffect(() => {
+    const enhanceGroundWithMixing = async () => {
+      if (!analysis || !analysis.groundSuggestions[0]) {
+        setEnhancedGroundSuggestion(null);
+        return;
+      }
+
+      const topSuggestion = analysis.groundSuggestions[0];
+      try {
+        // Get real mixing recipe from color mixer
+        const mixingResult = await matchColor(topSuggestion.color.rgb);
+        
+        // Merge the real mixing recipe into the ground suggestion
+        setEnhancedGroundSuggestion({
+          ...topSuggestion,
+          paletteMatches: mixingResult.paletteMatches,
+        });
+      } catch (error) {
+        console.error('Failed to enhance ground with mixing recipe:', error);
+        // Fall back to original suggestion
+        setEnhancedGroundSuggestion(topSuggestion);
+      }
+    };
+
+    enhanceGroundWithMixing();
+  }, [analysis]);
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -93,7 +122,8 @@ export default function App() {
     );
   }
 
-  const topSuggestion = analysis.groundSuggestions[0];
+  // Use enhanced ground suggestion with real mixing recipe
+  const topSuggestion = enhancedGroundSuggestion || analysis.groundSuggestions[0];
 
   return (
     <div className="app simple">
@@ -128,7 +158,7 @@ export default function App() {
                       <p className="dropper-recipe-label">How to mix it:</p>
                       <p className="dropper-recipe-name-bottom">{sampledColor.paletteMatches[0].name}</p>
                       <p className="dropper-recipe-mix-bottom">{sampledColor.paletteMatches[0].recipe}</p>
-                      <p className="dropper-delta-bottom">Color difference: ΔE {sampledColor.paletteMatches[0].deltaE.toFixed(1)}</p>
+                      <p className="dropper-delta-bottom">Similarity: {(100 - sampledColor.paletteMatches[0].deltaE).toFixed(1)}%</p>
                     </div>
                   )}
                 </div>
@@ -154,7 +184,7 @@ export default function App() {
               </div>
               {topSuggestion.paletteMatches.length > 0 && (
                 <div className="mixing-recommendation">
-                  <h3>Closest Match</h3>
+                  <h3>How to Mix This Ground Color</h3>
                   <div className="match-comparison">
                     <div className="comparison-swatches">
                       <div className="comparison-item">
@@ -162,20 +192,19 @@ export default function App() {
                           className="match-swatch"
                           style={{ backgroundColor: topSuggestion.color.hex }}
                         />
-                        <span className="swatch-label">Detected</span>
+                        <span className="swatch-label">Your Ground</span>
                       </div>
                       <div className="comparison-item">
                         <div
                           className="match-swatch"
                           style={{ backgroundColor: topSuggestion.paletteMatches[0].hex }}
                         />
-                        <span className="swatch-label">Match</span>
+                        <span className="swatch-label">Mixed Result</span>
                       </div>
                     </div>
                     <div className="match-details">
-                      <p className="match-name">{topSuggestion.paletteMatches[0].name}</p>
                       <p className="match-recipe">{topSuggestion.paletteMatches[0].recipe}</p>
-                      <p className="match-delta">ΔE: {topSuggestion.paletteMatches[0].deltaE.toFixed(1)}</p>
+                      <p className="match-delta">Similarity: {(100 - topSuggestion.paletteMatches[0].deltaE).toFixed(1)}%</p>
                       {topSuggestion.paletteMatches[0].notes && (
                         <p className="match-notes">{topSuggestion.paletteMatches[0].notes}</p>
                       )}
