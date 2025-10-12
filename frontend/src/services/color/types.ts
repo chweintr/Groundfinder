@@ -67,7 +67,7 @@ export interface ColorDefinition {
   id: number;
   name: string;
   hex: string;
-  rho: number[];
+  rho: number[] | Float64Array;
   opacity?: number;
 }
 
@@ -97,7 +97,7 @@ export interface Color {
   id: number;
   name: string;
   rgb: RgbTuple;
-  rho: number[];
+  rho: number[] | Float64Array;
   opacity?: ColorOpacity;
 }
 
