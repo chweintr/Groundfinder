@@ -112,12 +112,12 @@ export default function App() {
               onSample={handleColorSample}
               samplePoint={samplePoint}
             />
-            <p className="color-picker-hint">Click anywhere on the image to sample color</p>
+            <p className="color-picker-hint">👆 Tap or click any part of the painting to see mixing recipes for that color</p>
           </div>
 
           {sampledColor && (
             <div className="color-dropper-bottom">
-              <h3>Sampled Color</h3>
+              <h3>Color You Sampled</h3>
               <div className="dropper-content">
                 <div className="dropper-swatch-large" style={{ backgroundColor: sampledColor.color.hex }} />
                 <div className="dropper-info">
@@ -125,9 +125,10 @@ export default function App() {
                   <p className="dropper-temp-large">{sampledColor.color.temperature}</p>
                   {sampledColor.paletteMatches.length > 0 && (
                     <div className="dropper-recipe-bottom">
+                      <p className="dropper-recipe-label">How to mix it:</p>
                       <p className="dropper-recipe-name-bottom">{sampledColor.paletteMatches[0].name}</p>
                       <p className="dropper-recipe-mix-bottom">{sampledColor.paletteMatches[0].recipe}</p>
-                      <p className="dropper-delta-bottom">ΔE: {sampledColor.paletteMatches[0].deltaE.toFixed(1)}</p>
+                      <p className="dropper-delta-bottom">Color difference: ΔE {sampledColor.paletteMatches[0].deltaE.toFixed(1)}</p>
                     </div>
                   )}
                 </div>
