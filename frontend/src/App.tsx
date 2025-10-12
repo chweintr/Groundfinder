@@ -112,7 +112,28 @@ export default function App() {
               onSample={handleColorSample}
               samplePoint={samplePoint}
             />
+            <p className="color-picker-hint">Click anywhere on the image to sample color</p>
           </div>
+
+          {sampledColor && (
+            <div className="color-dropper-bottom">
+              <h3>Sampled Color</h3>
+              <div className="dropper-content">
+                <div className="dropper-swatch-large" style={{ backgroundColor: sampledColor.color.hex }} />
+                <div className="dropper-info">
+                  <p className="dropper-hex-large">{sampledColor.color.hex}</p>
+                  <p className="dropper-temp-large">{sampledColor.color.temperature}</p>
+                  {sampledColor.paletteMatches.length > 0 && (
+                    <div className="dropper-recipe-bottom">
+                      <p className="dropper-recipe-name-bottom">{sampledColor.paletteMatches[0].name}</p>
+                      <p className="dropper-recipe-mix-bottom">{sampledColor.paletteMatches[0].recipe}</p>
+                      <p className="dropper-delta-bottom">ΔE: {sampledColor.paletteMatches[0].deltaE.toFixed(1)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <aside className="recommendation-panel">
           {topSuggestion ? (
@@ -133,14 +154,27 @@ export default function App() {
               {topSuggestion.paletteMatches.length > 0 && (
                 <div className="mixing-recommendation">
                   <h3>Closest Match</h3>
-                  <div className="match">
-                    <div
-                      className="match-swatch"
-                      style={{ backgroundColor: topSuggestion.paletteMatches[0].hex }}
-                    />
-                    <div>
+                  <div className="match-comparison">
+                    <div className="comparison-swatches">
+                      <div className="comparison-item">
+                        <div
+                          className="match-swatch"
+                          style={{ backgroundColor: topSuggestion.color.hex }}
+                        />
+                        <span className="swatch-label">Detected</span>
+                      </div>
+                      <div className="comparison-item">
+                        <div
+                          className="match-swatch"
+                          style={{ backgroundColor: topSuggestion.paletteMatches[0].hex }}
+                        />
+                        <span className="swatch-label">Match</span>
+                      </div>
+                    </div>
+                    <div className="match-details">
                       <p className="match-name">{topSuggestion.paletteMatches[0].name}</p>
                       <p className="match-recipe">{topSuggestion.paletteMatches[0].recipe}</p>
+                      <p className="match-delta">ΔE: {topSuggestion.paletteMatches[0].deltaE.toFixed(1)}</p>
                       {topSuggestion.paletteMatches[0].notes && (
                         <p className="match-notes">{topSuggestion.paletteMatches[0].notes}</p>
                       )}
@@ -151,25 +185,6 @@ export default function App() {
             </>
           ) : (
             <p>No dominant ground detected</p>
-          )}
-
-          {sampledColor && (
-            <div className="color-dropper">
-              <h3>Color Dropper</h3>
-              <div className="dropper-match">
-                <div className="dropper-swatch" style={{ backgroundColor: sampledColor.color.hex }} />
-                <div className="dropper-details">
-                  <p className="dropper-temp">{sampledColor.color.temperature}</p>
-                  <p className="dropper-hex">{sampledColor.color.hex}</p>
-                </div>
-              </div>
-              {sampledColor.paletteMatches.length > 0 && (
-                <div className="dropper-recipe">
-                  <p className="dropper-recipe-name">{sampledColor.paletteMatches[0].name}</p>
-                  <p className="dropper-recipe-mix">{sampledColor.paletteMatches[0].recipe}</p>
-                </div>
-              )}
-            </div>
           )}
         </aside>
       </main>

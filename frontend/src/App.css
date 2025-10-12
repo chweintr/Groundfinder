@@ -76,8 +76,10 @@ header p {
 
 .image-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 1.5rem;
   background: #f8fafc;
   border-radius: 16px;
   padding: 2rem;
@@ -88,6 +90,10 @@ header p {
   position: relative;
   max-width: 100%;
   max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .image-wrapper img {
@@ -95,6 +101,13 @@ header p {
   max-height: 80vh;
   display: block;
   border-radius: 8px;
+}
+
+.color-picker-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
 }
 
 .image-wrapper .overlay {
@@ -173,32 +186,66 @@ header p {
   color: #334155;
 }
 
-.match {
+.match-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.comparison-swatches {
   display: flex;
   gap: 0.75rem;
-  align-items: start;
+  align-items: center;
+}
+
+.comparison-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .match-swatch {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   border-radius: 8px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.match p {
+.swatch-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.match-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.match-details p {
   margin: 0.25rem 0;
 }
 
 .match-name {
   font-weight: 600;
   color: #1e293b;
+  font-size: 0.95rem;
 }
 
 .match-recipe {
   color: #475569;
   font-size: 0.9rem;
+}
+
+.match-delta {
+  color: #1e293b;
+  font-size: 0.85rem;
+  font-family: monospace;
+  font-weight: 500;
 }
 
 .match-notes {
@@ -214,72 +261,86 @@ header p {
   margin-top: 0.25rem !important;
 }
 
-.color-dropper {
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1.5rem;
-  margin-top: 0.5rem;
+.color-dropper-bottom {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
 }
 
-.color-dropper h3 {
-  margin: 0 0 0.75rem 0;
-  font-size: 0.9rem;
-  color: #64748b;
-  font-weight: 500;
+.color-dropper-bottom h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 600;
 }
 
-.dropper-match {
+.dropper-content {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   align-items: center;
-  margin-bottom: 0.75rem;
 }
 
-.dropper-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+.dropper-swatch-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.dropper-details {
+.dropper-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  flex: 1;
 }
 
-.dropper-temp {
-  font-size: 0.8rem;
+.dropper-hex-large {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: #1e293b;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dropper-temp-large {
+  font-size: 0.9rem;
   color: #64748b;
   text-transform: capitalize;
   font-style: italic;
   margin: 0;
 }
 
-.dropper-hex {
-  font-family: monospace;
-  font-size: 0.85rem;
-  color: #475569;
-  margin: 0;
-}
-
-.dropper-recipe {
+.dropper-recipe-bottom {
   background: #f8fafc;
   border-radius: 8px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   border: 1px solid #e2e8f0;
+  margin-top: 0.25rem;
 }
 
-.dropper-recipe-name {
-  font-size: 0.85rem;
+.dropper-recipe-name-bottom {
+  font-size: 0.9rem;
   font-weight: 600;
   color: #334155;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.35rem 0;
 }
 
-.dropper-recipe-mix {
+.dropper-recipe-mix-bottom {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.4;
+}
+
+.dropper-delta-bottom {
   font-size: 0.8rem;
   color: #64748b;
+  font-family: monospace;
   margin: 0;
 }
 
@@ -374,6 +435,7 @@ header p {
   max-width: 100%;
   max-height: 100%;
   display: block;
+  cursor: crosshair;
 }
 
 .image-viewer img.overlay {
