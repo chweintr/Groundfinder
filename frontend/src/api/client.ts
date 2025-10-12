@@ -86,11 +86,82 @@ export function asDataUrl(base64: string, mime = "image/png"): string {
   return `data:${mime};base64,${base64}`;
 }
 
+import { ColorMixer } from '../services/color/color-mixer';
+import { DEFAULT_PIGMENT_SET } from '../services/color/pigments';
+import { Rgb } from '../services/color/space/rgb';
+import type { RgbTuple } from '../services/color/space/rgb';
+
+// Initialize color mixer with pigment set
+let colorMixer: ColorMixer | null = null;
+
+function getColorMixer(): ColorMixer {
+  if (!colorMixer) {
+    colorMixer = new ColorMixer();
+    colorMixer.setColorSet(DEFAULT_PIGMENT_SET, '#F7F5EF'); // Paper white background
+  }
+  return colorMixer;
+}
+
 export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
-  const response = await fetch(`${API_BASE_URL}/match-color`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rgb }),
-  });
-  return handleResponse<ColorMatchResponse>(response);
+  try {
+    const mixer = getColorMixer();
+    const rgbTuple: RgbTuple = [rgb[0]!, rgb[1]!, rgb[2]!];
+    
+    // Find the best color mixture match
+    const similarColor = mixer.findSimilarColor(rgbTuple);
+    
+    if (!similarColor) {
+      throw new Error('No color match found');
+    }
+
+    const { colorMixture, similarity } = similarColor;
+    const rgbColor = Rgb.fromTuple(colorMixture.layerRgb);
+    
+    // Format the recipe as a human-readable string
+    const recipeParts = colorMixture.parts
+      .map(({ color, part }) => `${color.name} (${part})`)
+      .join(' + ');
+    
+    const recipe = colorMixture.parts.length === 1
+      ? colorMixture.parts[0]!.color.name
+      : recipeParts;
+
+    // Determine temperature (simplified)
+    const [r, g, b] = colorMixture.layerRgb;
+    let temperature = 'neutral';
+    if (r! > g! + 20 && r! > b! + 20) temperature = 'warm';
+    else if (b! > r! + 20 && b! > g! + 20) temperature = 'cool';
+
+    return {
+      color: {
+        hex: rgbColor.toHex(),
+        rgb: [r!, g!, b!],
+        lab: [0, 0, 0], // Not needed for display
+        lch: [0, 0, 0], // Not needed for display
+        temperature,
+      },
+      paletteMatches: [
+        {
+          id: `mixture-${Date.now()}`,
+          name: colorMixture.parts.length === 1 ? colorMixture.parts[0]!.color.name : 'Custom Mixture',
+          hex: rgbColor.toHex(),
+          lab: [0, 0, 0],
+          lch: [0, 0, 0],
+          rgb: [r!, g!, b!],
+          deltaE: 100 - similarity, // Convert similarity to deltaE-like metric
+          recipe,
+          notes: `Similarity: ${similarity.toFixed(1)}%`,
+        },
+      ],
+    };
+  } catch (error) {
+    console.error('Local color matching failed, falling back to server:', error);
+    // Fallback to server if local matching fails
+    const response = await fetch(`${API_BASE_URL}/match-color`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rgb }),
+    });
+    return handleResponse<ColorMatchResponse>(response);
+  }
 }
