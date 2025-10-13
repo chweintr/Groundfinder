@@ -97,16 +97,18 @@ export function ImageViewer({ imageUrl, overlayUrl, onSample, samplePoint }: Ima
 
   return (
     <div className="image-viewer">
-      <img
-        ref={imageRef}
-        src={imageUrl}
-        alt="Uploaded"
-        className="base"
-        onClick={handlePointer}
-      />
-      {overlayUrl && <img src={overlayUrl} alt="Overlay" className="overlay" />}
+      <div className="image-wrapper-relative">
+        <img
+          ref={imageRef}
+          src={imageUrl}
+          alt="Uploaded"
+          className="base"
+          onClick={handlePointer}
+        />
+        {overlayUrl && <img src={overlayUrl} alt="Overlay" className="overlay" />}
+        {markerStyle && <div className="sample-marker" style={markerStyle} />}
+      </div>
       <canvas ref={canvasRef} className="hidden-canvas" />
-      {markerStyle && <div className="sample-marker" style={markerStyle} />}
     </div>
   );
 }
