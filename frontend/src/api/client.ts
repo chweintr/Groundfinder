@@ -116,15 +116,38 @@ export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
   try {
     const mixer = getColorMixer();
     const rgbTuple: RgbTuple = [rgb[0]!, rgb[1]!, rgb[2]!];
-    console.log('Finding similar color for:', rgbTuple);
+    console.log('Finding similar colors for:', rgbTuple);
     
-    // Find the best color mixture match
-    const similarColor = mixer.findSimilarColor(rgbTuple);
-    console.log('Similar color found:', similarColor);
+    // Find multiple similar colors and pick the best one
+    const similarColors = mixer.findSimilarColors(rgbTuple);
+    console.log('Similar colors found:', similarColors.length, similarColors.slice(0, 5));
     
-    if (!similarColor) {
+    if (!similarColors || similarColors.length === 0) {
       throw new Error('No color match found');
     }
+    
+    // Calculate lightness of target color
+    const targetLab = rgbToLab(rgbTuple[0], rgbTuple[1], rgbTuple[2]);
+    const targetLightness = targetLab[0];
+    
+    // For lighter colors (L > 40), strongly prefer recipes with white
+    // For darker colors, prefer simpler recipes
+    let bestMatch = similarColors[0]!;
+    
+    if (targetLightness > 40) {
+      // Look for a match with white in the top 5 results
+      const matchWithWhite = similarColors.slice(0, 5).find(
+        sc => sc.colorMixture.white && sc.colorMixture.whiteFraction[0] > 0
+      );
+      
+      if (matchWithWhite && matchWithWhite.similarity > bestMatch.similarity * 0.95) {
+        // Use white-tinted version if similarity is within 5% of best
+        bestMatch = matchWithWhite;
+        console.log('Selected recipe with white for lighter color');
+      }
+    }
+    
+    const similarColor = bestMatch;
 
     const { colorMixture, similarity } = similarColor;
     const rgbColor = Rgb.fromTuple(colorMixture.layerRgb);

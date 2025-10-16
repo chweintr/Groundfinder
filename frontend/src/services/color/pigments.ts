@@ -12,11 +12,12 @@ const PIGMENT_DATA: Array<{
   opacity?: ColorOpacity;
 }> = [
   // Whites
-  { id: 1, name: 'Titanium White', hex: '#FFFFFF', opacity: ColorOpacity.Opaque },
+  { id: 1, name: 'Titanium White', hex: '#FEFEFE', opacity: ColorOpacity.Opaque },
   
   // Yellows
   { id: 10, name: 'Cadmium Lemon', hex: '#FFF44F' },
   { id: 11, name: 'Cadmium Yellow Medium', hex: '#FFEC00' },
+  { id: 12, name: 'Yellow Ochre', hex: '#D4AA3B' },
   
   // Oranges & Reds
   { id: 20, name: 'Cadmium Orange', hex: '#FF8C00' },
@@ -30,10 +31,13 @@ const PIGMENT_DATA: Array<{
   { id: 30, name: 'Phthalo Blue', hex: '#000F89', opacity: ColorOpacity.Transparent },
   { id: 31, name: 'Ultramarine Blue', hex: '#4166F5' },
   { id: 32, name: 'Sevres Blue', hex: '#3E76B8' },
+  { id: 33, name: 'Cerulean Blue', hex: '#2A52BE' },
   
   // Greens
   { id: 40, name: 'Phthalo Green', hex: '#123524', opacity: ColorOpacity.Transparent },
   { id: 41, name: 'Sap Green', hex: '#507D2A' },
+  { id: 42, name: 'Viridian', hex: '#40826D', opacity: ColorOpacity.Transparent },
+  { id: 43, name: 'Chromium Oxide Green', hex: '#5E8C5E' },
   
   // Purples
   { id: 50, name: 'Dioxazine Purple', hex: '#3F2A56', opacity: ColorOpacity.Transparent },
@@ -41,6 +45,8 @@ const PIGMENT_DATA: Array<{
   // Earth tones
   { id: 60, name: 'Burnt Umber', hex: '#8A3324' },
   { id: 61, name: 'Burnt Sienna', hex: '#E97451' },
+  { id: 62, name: 'Raw Umber', hex: '#826644' },
+  { id: 63, name: 'Raw Sienna', hex: '#D68A59' },
 ];
 
 const BRAND_ID = 1;
