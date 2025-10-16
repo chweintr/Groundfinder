@@ -202,6 +202,29 @@ header p {
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
   color: #334155;
+  font-weight: 600;
+}
+
+.recipe-display {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.recipe-text {
+  font-size: 1rem;
+  color: #1e293b;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.recipe-accuracy {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
 }
 
 .match-comparison {

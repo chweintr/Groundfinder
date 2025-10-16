@@ -90,6 +90,7 @@ import { ColorMixer } from '../services/color/color-mixer';
 import { DEFAULT_PIGMENT_SET } from '../services/color/pigments';
 import { Rgb } from '../services/color/space/rgb';
 import type { RgbTuple } from '../services/color/space/rgb';
+import { rgbToLab, rgbToLch } from '../utils/colorConversion';
 
 // Initialize color mixer with pigment set
 let colorMixer: ColorMixer | null = null;
@@ -127,42 +128,63 @@ export async function matchColor(rgb: number[]): Promise<ColorMatchResponse> {
 
     const { colorMixture, similarity } = similarColor;
     const rgbColor = Rgb.fromTuple(colorMixture.layerRgb);
-    console.log('Color mixture:', colorMixture.parts, 'similarity:', similarity);
+    console.log('Color mixture:', colorMixture, 'similarity:', similarity);
     
-    // Format the recipe as a human-readable string
-    const recipeParts = colorMixture.parts
+    const [r, g, b] = colorMixture.layerRgb;
+    
+    // Calculate LAB and LCH from the result RGB
+    const lab = rgbToLab(r!, g!, b!);
+    const lch = rgbToLch(r!, g!, b!);
+    console.log('LAB:', lab, 'LCH:', lch);
+    
+    // Determine temperature from LCH
+    const chroma = lch[1];
+    const hueAngle = lch[2];
+    let temperature = 'neutral';
+    if (chroma > 8) {
+      if ((hueAngle >= 0 && hueAngle <= 60) || hueAngle >= 300) {
+        temperature = 'warm';
+      } else if (hueAngle > 60 && hueAngle < 240) {
+        temperature = 'cool';
+      } else {
+        temperature = 'warm';
+      }
+    }
+    
+    // Format the recipe including white tint if present
+    const colorParts = colorMixture.parts
       .map(({ color, part }) => `${color.name} (${part})`)
       .join(' + ');
     
-    const recipe = colorMixture.parts.length === 1
+    const whitePart = colorMixture.white && colorMixture.whiteFraction[0] > 0
+      ? ` + ${colorMixture.white.name} (${colorMixture.whiteFraction[0]})`
+      : '';
+    
+    const recipe = colorMixture.parts.length === 1 && !whitePart
       ? colorMixture.parts[0]!.color.name
-      : recipeParts;
-
-    // Determine temperature (simplified)
-    const [r, g, b] = colorMixture.layerRgb;
-    let temperature = 'neutral';
-    if (r! > g! + 20 && r! > b! + 20) temperature = 'warm';
-    else if (b! > r! + 20 && b! > g! + 20) temperature = 'cool';
+      : colorParts + whitePart;
+    
+    console.log('Final recipe:', recipe);
 
     return {
       color: {
         hex: rgbColor.toHex(),
         rgb: [r!, g!, b!],
-        lab: [0, 0, 0], // Not needed for display
-        lch: [0, 0, 0], // Not needed for display
+        lab,
+        lch,
         temperature,
       },
       paletteMatches: [
         {
           id: `mixture-${Date.now()}`,
-          name: colorMixture.parts.length === 1 ? colorMixture.parts[0]!.color.name : 'Custom Mixture',
+          name: colorMixture.parts.length === 1 && !whitePart ? colorMixture.parts[0]!.color.name : 'Custom Mixture',
           hex: rgbColor.toHex(),
-          lab: [0, 0, 0],
-          lch: [0, 0, 0],
+          lab,
+          lch,
           rgb: [r!, g!, b!],
-          deltaE: 100 - similarity, // Convert similarity to deltaE-like metric
+          deltaE: 100 - similarity,
           recipe,
-          notes: `Similarity: ${similarity.toFixed(1)}%`,
+          notes: `Match accuracy: ${similarity.toFixed(1)}%`,
         },
       ],
     };

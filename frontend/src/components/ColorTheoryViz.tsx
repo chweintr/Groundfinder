@@ -6,10 +6,14 @@ interface ColorTheoryVizProps {
 }
 
 export function ColorTheoryViz({ hex, lab, lch, temperature }: ColorTheoryVizProps) {
+  console.log('ColorTheoryViz received:', { hex, lab, lch, temperature });
+  
   // Extract values from LAB/LCH
   const lightness = lab ? lab[0] : (lch ? lch[0] : 50);
   const chroma = lch ? lch[1] : 0;
   const hue = lch ? lch[2] : 0;
+  
+  console.log('Calculated values:', { lightness, chroma, hue });
 
   // Convert to educational scales
   const valueScale = Math.round((lightness / 100) * 10); // 1-10 scale

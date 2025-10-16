@@ -198,31 +198,10 @@ export default function App() {
               </div>
               {topSuggestion.paletteMatches.length > 0 && (
                 <div className="mixing-recommendation">
-                  <h3>How to Mix This Ground Color</h3>
-                  <div className="match-comparison">
-                    <div className="comparison-swatches">
-                      <div className="comparison-item">
-                        <div
-                          className="match-swatch"
-                          style={{ backgroundColor: topSuggestion.color.hex }}
-                        />
-                        <span className="swatch-label">Your Ground</span>
-                      </div>
-                      <div className="comparison-item">
-                        <div
-                          className="match-swatch"
-                          style={{ backgroundColor: topSuggestion.paletteMatches[0].hex }}
-                        />
-                        <span className="swatch-label">Mixed Result</span>
-                      </div>
-                    </div>
-                    <div className="match-details">
-                      <p className="match-recipe">{topSuggestion.paletteMatches[0].recipe}</p>
-                      <p className="match-delta">Similarity: {(100 - topSuggestion.paletteMatches[0].deltaE).toFixed(1)}%</p>
-                      {topSuggestion.paletteMatches[0].notes && (
-                        <p className="match-notes">{topSuggestion.paletteMatches[0].notes}</p>
-                      )}
-                    </div>
+                  <h3>How to Mix It</h3>
+                  <div className="recipe-display">
+                    <p className="recipe-text">{topSuggestion.paletteMatches[0].recipe}</p>
+                    <p className="recipe-accuracy">{topSuggestion.paletteMatches[0].notes}</p>
                   </div>
                 </div>
               )}
