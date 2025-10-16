@@ -55,7 +55,7 @@ export function labToLch(L: number, a: number, b: number): [number, number, numb
 }
 
 export function rgbToLch(r: number, g: number, b: number): [number, number, number] {
-  const [L, a, b] = rgbToLab(r, g, b);
-  return labToLch(L, a, b);
+  const [L, a, bLab] = rgbToLab(r, g, b);
+  return labToLch(L, a, bLab);
 }
 
